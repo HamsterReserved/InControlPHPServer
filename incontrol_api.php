@@ -1,0 +1,145 @@
+<?php
+/**
+ * InControl API
+ * Parameters:
+ *  device_type : 1 - Server (sensor, home control center)
+ *                2 - Client (Mobile devices, tablets, computers)
+ *                Required for every request, of course.
+ *  device_id : Serial number for each server unit, may be found on the shell of box. 
+ *              Required for each request.
+ *  request_type : The purpose of this request by client.
+ *                 1 - Query what sensor is connected to control center
+ *                 2 - Query sensors info
+ *                 3 - Update sensor name etc
+ *                 Other values are reserved.
+ *                 Required for client only.
+ *  credentials : Self-explanatory. (IF ADDED PROPERLY) Required for each request.
+ *  sensor_id : Required for server reporting data. Optional for client.
+ *  sensor_info : Self-explanatory. Required for server only.
+ *  info_date : For server: time of this status update (from board RTC)
+ *              For client: last fetched date (so won't fetch repeat data. Client should take care of repeated things though)
+ *
+ *  Since the M660 module only supports GET method, no POST is implemented and allowed here.
+ *
+ *  And note that 0 == NULL == "0" here!
+ */
+    require('inccon.php'); // Configuration file. Note this is not a function!
+      
+    switch ($_GET['device_type']) {
+        case "1":
+            process_server_request();
+            break;
+        case "2":
+            process_client_request();
+            break;
+        default:
+            ensure_not_null(NULL, "device_type", "Main Page");
+    }
+    // Main page ends here.
+
+    // If the first parameter is null, just show a error and exit
+    function ensure_not_null($var, $var_name, $function_name, $prompt_msg = NULL) {
+        global $DEBUG;
+        
+        if ($prompt_msg == NULL)
+            $prompt_msg = " not defined!"; // TODO: Is this needed or just take this as default value?
+        
+        if ($var == NULL)
+            if ($DEBUG) {
+                header('HTTP/1.1 404 Not Found'); 
+                header("status: 404 Not Found"); 
+                die($function_name . ": " . $var_name . $prompt_msg);
+            } else {
+                header('HTTP/1.1 404 Not Found'); 
+                header("status: 404 Not Found"); 
+                die("Not implemented.");
+                }
+    }
+
+    function check_credentials($credentials) {
+        global $OFFLINE_TEST;
+        global $CREDENTIALS_ENABLED;
+        
+        // TODO: Do check things here, such as NULL and not match, then die or not
+        if ($OFFLINE_TEST)
+            return true;
+    }
+    
+    function process_server_request() {
+        global $OFFLINE_TEST, $CREDENTIALS_ENABLED;
+        
+        $device_id = $_GET['device_id'];
+        $credentials = $_GET['credentials'];
+        $sensor_id = $_GET['sensor_id'];
+        $sensor_info = $_GET['sensor_info'];
+        $info_date = $_GET['info_date'];
+        
+        ensure_not_null($device_id, "device_id", __FUNCTION__);
+        ensure_not_null($sensor_id, "sensor_id", __FUNCTION__);
+        ensure_not_null($sensor_info, "sensor_info", __FUNCTION__);
+        ensure_not_null($info_date, "info_date", __FUNCTION__);
+        
+        if ($CREDENTIALS_ENABLED) {
+            check_credentials($credentials);
+        }
+        
+        if ($OFFLINE_TEST)
+            echo "OK";
+        else {
+            // TODO: Do something here. Write to database, validate device ID, return result etc.
+        }
+    }
+    
+    function process_client_request() {
+        global $OFFLINE_TEST, $CREDENTIALS_ENABLED;
+        
+        $device_id = $_GET['device_id'];
+        $request_type = $_GET['request_type'];
+        $credentials = $_GET['credentials'];
+        $sensor_id = $_GET['sensor_id'];
+        $info_date = $_GET['info_date'];
+        
+        ensure_not_null($device_id, "device_id", __FUNCTION__);
+        ensure_not_null($request_type, "request_type", __FUNCTION__);
+        
+        if ($CREDENTIALS_ENABLED) {
+            check_credentials($credentials);
+        }
+
+        switch ($request_type) {
+            case "1":
+                respond_sensor_list($device_id);
+                break;
+            case "2":
+                respond_sensor_info($device_id, $sensor_id, $info_date);
+                break;
+            default:
+                ensure_not_null(NULL, "request_type", __FUNCTION__, " submitted is unknown!");
+        }
+    }
+    
+    function respond_sensor_list($device_id) {
+        global $OFFLINE_TEST, $TEST_SENSOR_LIST_RESPONSE;
+        
+        ensure_not_null($device_id, "device_id", __FUNCTION__);
+        //TODO: Send request to control center (shall we accomplish this by SMS?)
+        if ($OFFLINE_TEST)
+            if ($device_id == "1")
+                echo $TEST_SENSOR_LIST_RESPONSE;
+            else
+                ensure_not_null(NULL, "device_id", __FUNCTION__, " unknown!");
+    }
+    
+    function respond_sensor_info($device_id, $sensor_id, $info_date) {
+        global $OFFLINE_TEST, $TEST_SENSOR_INFO_RESPONSE;
+    
+        ensure_not_null($device_id, "device_id", __FUNCTION__);
+        ensure_not_null($sensor_id, "sensor_id", __FUNCTION__);
+        // TODO: Query from db, note that sensor_id and info_date is optional
+        if ($OFFLINE_TEST)
+            if ($device_id == "1")
+                echo $TEST_SENSOR_INFO_RESPONSE;
+            else
+                ensure_not_null(NULL, "device_id", __FUNCTION__, " unknown!");
+    }
+?>
