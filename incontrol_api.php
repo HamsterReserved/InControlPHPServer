@@ -1,7 +1,7 @@
 <?php
 /**
  * InControl API
- * Parameters:
+ * Parameters: (SEE constants.php)
  *  device_type : 1 - Server (sensor, home control center)
  *                2 - Client (Mobile devices, tablets, computers)
  *                Required for every request, of course.
@@ -23,13 +23,14 @@
  *
  *  And note that 0 == NULL == "0" here!
  */
-    require('inccon.php'); // Configuration file. Note this is not a function!
+    require_once('incontrol_constants.php');
+    require_once('inccon.php'); // Configuration file. Note this is not a function!
       
     switch ($_GET['device_type']) {
-        case "1":
+        case $DEVICE_TYPE_SERVER:
             process_server_request();
             break;
-        case "2":
+        case $DEVICE_TYPE_CLIENT:
             process_client_request();
             break;
         default:
@@ -46,14 +47,14 @@
         
         if ($var == NULL)
             if ($DEBUG) {
-                header('HTTP/1.1 404 Not Found'); 
-                header("status: 404 Not Found"); 
+                header('HTTP/1.1 501 Not implemented');
+                header("status: 501 Not implemented");
                 die($function_name . ": " . $var_name . $prompt_msg);
             } else {
-                header('HTTP/1.1 404 Not Found'); 
-                header("status: 404 Not Found"); 
+                header('HTTP/1.1 501 Not implemented');
+                header("status: 501 Not implemented");
                 die("Not implemented.");
-                }
+            }
     }
 
     function check_credentials($credentials) {
@@ -92,6 +93,7 @@
     
     function process_client_request() {
         global $OFFLINE_TEST, $CREDENTIALS_ENABLED;
+        global $REQUEST_TYPE_QUERY_SENSOR_LIST, $REQUEST_TYPE_QUERY_SENSOR_INFO;
         
         $device_id = $_GET['device_id'];
         $request_type = $_GET['request_type'];
@@ -107,10 +109,10 @@
         }
 
         switch ($request_type) {
-            case "1":
+            case $REQUEST_TYPE_QUERY_SENSOR_LIST:
                 respond_sensor_list($device_id);
                 break;
-            case "2":
+            case $REQUEST_TYPE_QUERY_SENSOR_INFO:
                 respond_sensor_info($device_id, $sensor_id, $info_date);
                 break;
             default:
