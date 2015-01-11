@@ -133,14 +133,17 @@
     }
     
     function respond_sensor_info($device_id, $sensor_id, $info_date) {
-        global $OFFLINE_TEST, $TEST_SENSOR_INFO_RESPONSE;
+        global $OFFLINE_TEST, $TEST_SENSOR_0_INFO_RESPONSE, $TEST_SENSOR_1_INFO_RESPONSE;
     
         ensure_not_null($device_id, "device_id", __FUNCTION__);
         ensure_not_null($sensor_id, "sensor_id", __FUNCTION__);
         // TODO: Query from db, note that sensor_id and info_date is optional
         if ($OFFLINE_TEST)
             if ($device_id == "1")
-                echo $TEST_SENSOR_INFO_RESPONSE;
+                if ($sensor_id == "0")
+                    echo $TEST_SENSOR_0_INFO_RESPONSE;
+                else if ($sensor_id == "1")
+                    echo $TEST_SENSOR_1_INFO_RESPONSE;
             else
                 ensure_not_null(NULL, "device_id", __FUNCTION__, " unknown!");
     }
