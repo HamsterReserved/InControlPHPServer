@@ -8,5 +8,7 @@
     $SENSOR_TYPE_LIGHT = 0;
     $SENSOR_TYPE_ELECTRICITY = 1;
     $SENSOR_TYPE_MOTION = 2;
-    // add more
+    $SENSOR_TYPE_SWITCH = 3;
+    $SENSOR_TYPE_IR = 4;
+    // keep in sync with STM32 and Android
 ?>
