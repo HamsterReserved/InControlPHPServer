@@ -1,5 +1,6 @@
 <?php
     require_once('incontrol_constants.php');
+    require_once('inccon_db.php');
 
     //error_reporting(0);
     error_reporting(E_ALL ^ E_NOTICE);
