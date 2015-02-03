@@ -24,45 +24,22 @@
  *  And note that 0 == NULL == "0" here!
  */
     require_once('incontrol_constants.php');
+    require_once('incontrol_common.php');
     require_once('inccon.php'); // Configuration file. Note this is not a function!
-      
+    require_once('incontrol_db.php'); // DBOperator class
+
+    $dboperator = new dboperator();
     switch ($_GET['device_type']) {
-        case $DEVICE_TYPE_SERVER:
+        case DEVICE_TYPE_SERVER:
             process_server_request();
             break;
-        case $DEVICE_TYPE_CLIENT:
+        case DEVICE_TYPE_CLIENT:
             process_client_request();
             break;
         default:
             ensure_not_null(NULL, "device_type", "Main Page");
     }
     // Main page ends here.
-
-    // If the first parameter is null, just show a error and exit
-    function ensure_not_null($var, $var_name, $function_name, $prompt_msg = NULL) {
-        
-        if ($prompt_msg == NULL)
-            $prompt_msg = " not defined!"; // TODO: Is this needed or just take this as default value?
-        
-        if ($var == NULL)
-            if (DEBUG) {
-                header('HTTP/1.1 501 Not implemented');
-                header("status: 501 Not implemented");
-                die($function_name . ": " . $var_name . $prompt_msg);
-            } else {
-                header('HTTP/1.1 501 Not implemented');
-                header("status: 501 Not implemented");
-                die("Not implemented.");
-            }
-    }
-
-    function check_credentials($credentials) {
-        // TODO: Do check things here, such as NULL and not match, then die or not
-        if (CREDENTIALS_ENABLED || OFFLINE_TEST)
-            return true;
-        else
-            ensure_not_null(NULL, "cred", __FUNCTION__, "does not comply!");
-    }
     
     function process_server_request() {
         $device_id = $_GET['device_id'];
@@ -100,10 +77,10 @@
         check_credentials($credentials);
 
         switch ($request_type) {
-            case $REQUEST_TYPE_QUERY_SENSOR_LIST:
+            case REQUEST_TYPE_QUERY_SENSOR_LIST:
                 respond_sensor_list($device_id);
                 break;
-            case $REQUEST_TYPE_QUERY_SENSOR_INFO:
+            case REQUEST_TYPE_QUERY_SENSOR_INFO:
                 respond_sensor_info($device_id, $sensor_id, $info_date);
                 break;
             default:
