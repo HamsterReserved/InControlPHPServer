@@ -58,8 +58,10 @@
 
     function check_credentials($credentials) {
         // TODO: Do check things here, such as NULL and not match, then die or not
-        if ($OFFLINE_TEST)
+        if (CREDENTIALS_ENABLED || OFFLINE_TEST)
             return true;
+        else
+            ensure_not_null(NULL, "cred", __FUNCTION__, "does not comply!");
     }
     
     function process_server_request() {
@@ -74,9 +76,7 @@
         ensure_not_null($sensor_info, "sensor_info", __FUNCTION__);
         ensure_not_null($info_date, "info_date", __FUNCTION__);
         
-        if ($CREDENTIALS_ENABLED) {
-            check_credentials($credentials);
-        }
+        check_credentials($credentials);
         
         if (OFFLINE_TEST)
             echo "OK";
@@ -97,9 +97,7 @@
         ensure_not_null($device_id, "device_id", __FUNCTION__);
         ensure_not_null($request_type, "request_type", __FUNCTION__);
         
-        if ($CREDENTIALS_ENABLED) {
-            check_credentials($credentials);
-        }
+        check_credentials($credentials);
 
         switch ($request_type) {
             case $REQUEST_TYPE_QUERY_SENSOR_LIST:
