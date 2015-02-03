@@ -40,13 +40,12 @@
 
     // If the first parameter is null, just show a error and exit
     function ensure_not_null($var, $var_name, $function_name, $prompt_msg = NULL) {
-        global $DEBUG;
         
         if ($prompt_msg == NULL)
             $prompt_msg = " not defined!"; // TODO: Is this needed or just take this as default value?
         
         if ($var == NULL)
-            if ($DEBUG) {
+            if (DEBUG) {
                 header('HTTP/1.1 501 Not implemented');
                 header("status: 501 Not implemented");
                 die($function_name . ": " . $var_name . $prompt_msg);
@@ -58,17 +57,12 @@
     }
 
     function check_credentials($credentials) {
-        global $OFFLINE_TEST;
-        global $CREDENTIALS_ENABLED;
-        
         // TODO: Do check things here, such as NULL and not match, then die or not
         if ($OFFLINE_TEST)
             return true;
     }
     
     function process_server_request() {
-        global $OFFLINE_TEST, $CREDENTIALS_ENABLED;
-        
         $device_id = $_GET['device_id'];
         $credentials = $_GET['credentials'];
         $sensor_id = $_GET['sensor_id'];
@@ -84,7 +78,7 @@
             check_credentials($credentials);
         }
         
-        if ($OFFLINE_TEST)
+        if (OFFLINE_TEST)
             echo "OK";
         else {
             // TODO: Do something here. Write to database, validate device ID, return result etc.
@@ -92,7 +86,6 @@
     }
     
     function process_client_request() {
-        global $OFFLINE_TEST, $CREDENTIALS_ENABLED;
         global $REQUEST_TYPE_QUERY_SENSOR_LIST, $REQUEST_TYPE_QUERY_SENSOR_INFO;
         
         $device_id = $_GET['device_id'];
@@ -121,11 +114,11 @@
     }
     
     function respond_sensor_list($device_id) {
-        global $OFFLINE_TEST, $TEST_SENSOR_LIST_RESPONSE;
+        global $TEST_SENSOR_LIST_RESPONSE;
         
         ensure_not_null($device_id, "device_id", __FUNCTION__);
         //TODO: Send request to control center (shall we accomplish this by SMS?)
-        if ($OFFLINE_TEST)
+        if (OFFLINE_TEST)
             if ($device_id == "1")
                 echo $TEST_SENSOR_LIST_RESPONSE;
             else
@@ -133,12 +126,12 @@
     }
     
     function respond_sensor_info($device_id, $sensor_id, $info_date) {
-        global $OFFLINE_TEST, $TEST_SENSOR_0_INFO_RESPONSE, $TEST_SENSOR_1_INFO_RESPONSE;
+        global $TEST_SENSOR_0_INFO_RESPONSE, $TEST_SENSOR_1_INFO_RESPONSE;
     
         ensure_not_null($device_id, "device_id", __FUNCTION__);
         ensure_not_null($sensor_id, "sensor_id", __FUNCTION__);
         // TODO: Query from db, note that sensor_id and info_date is optional
-        if ($OFFLINE_TEST)
+        if (OFFLINE_TEST)
             if ($device_id == "1")
                 if ($sensor_id == "0")
                     echo $TEST_SENSOR_0_INFO_RESPONSE;

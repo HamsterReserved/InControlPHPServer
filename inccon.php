@@ -5,9 +5,9 @@
     //error_reporting(0);
     error_reporting(E_ALL ^ E_NOTICE);
 
-    $CREDENTIAL_ENABLED = false;
-    $DEBUG = true; // More debug info when error
-    $OFFLINE_TEST = true; // No database enabled, pass credential test
+    define("CREDENTIAL_ENABLED", false);
+    define("DEBUG", true); // More debug info when error
+    define("OFFLINE_TEST", true); // No database enabled, pass credential test
 
     // Tests
     $TEST_SENSOR_INFO_0 = array("sensor_id" => 0, "sensor_name" => "Test Sensor 2", "sensor_type" => $SENSOR_TYPE_LIGHT, "sensor_info" => 115);
