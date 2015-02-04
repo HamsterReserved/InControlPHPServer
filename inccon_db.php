@@ -8,23 +8,23 @@
     define("SENSOR_DATA_TBL_NAME", "sensor_data");
     
     $CONTROL_CENTER_COLUMNS = array(
-                        "row_id" => "int NOT NULL AUTO_INCREMENT",
-                        "machine_id" => "text",
-                        "man_date" => "int",
-                        "reg_date" => "int",
-                        "clients" => "text",
-                        "triggers" => "text"
+                        "machine_id" => "text", // Device ID
+                        "man_date" => "int", // Manufacturing date
+                        "reg_date" => "int", // First time registered (user activation)
+                        "clients" => "text", // Allowed client IDs
+                        "triggers" => "text", // Send SMS etc
+                        "state" => "tinyint", // Will I accept new clients/sensors? 0=normal 1=new clients 2=new sensors
+                        "last_state_date" => "int" // Reject new clients/sensors after 2mins
                         );
     define("CONTROL_CENTER_PRIMARY_KEY", "row_id");
     
-    $SENSOR_COLUMNS = array(
-                        "row_id" => "int NOT NULL AUTO_INCREMENT",
+    $SENSOR_DATA_COLUMNS = array(
                         "sensor_id" => "text",
                         "sensor_type" => "int",
                         "sensor_name" => "text",
                         "sensor_date" => "int",
                         "sensor_value" => "int",
-                        "machine_id" => "text"
+                        "machine_id" => "text" // Paired host machine
                         );
     define("SENSOR_DATA_PRIMARY_KEY", "row_id");
 ?>

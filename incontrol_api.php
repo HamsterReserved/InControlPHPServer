@@ -23,9 +23,10 @@
  *
  *  And note that 0 == NULL == "0" here!
  */
-    require_once('incontrol_constants.php');
+    require_once('inccon_const.php');
+    require_once('inccon_config.php'); // Configuration file. Note this is not a function!
+
     require_once('incontrol_common.php');
-    require_once('inccon.php'); // Configuration file. Note this is not a function!
     require_once('incontrol_db.php'); // DBOperator class
 
     $dboperator = new dboperator();

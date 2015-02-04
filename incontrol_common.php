@@ -1,4 +1,6 @@
 <?php
+    require_once('inccon_config.php');
+
     // If the first parameter is null, just show a error and exit
     function ensure_not_null($var_to_check, $var_name, $function_name, $prompt_msg = NULL) {
         
