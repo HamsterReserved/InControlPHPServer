@@ -1,9 +1,17 @@
 <?php
-    define("DB_HOST", 'localhost');
-    define("DB_USERNAME", 'stub_user');
-    define("DB_PASSWORD", 'stub_password');
-    define("DB_PORT", "3367"); // May not use this
-    define("DB_NAME", "app_incontrol");
+    if (defined(IS_SAE)) {
+        define("DB_HOST", SAE_MYSQL_HOST_M);
+        define("DB_USERNAME", SAE_MYSQL_USER);
+        define("DB_PASSWORD", SAE_MYSQL_PASS);
+        define("DB_PORT", SAE_MYSQL_PORT); // May not use this
+        define("DB_NAME", SAE_MYSQL_DB);
+    } else {
+        define("DB_HOST", 'localhost');
+        define("DB_USERNAME", 'stub_user');
+        define("DB_PASSWORD", 'stub_password');
+        define("DB_PORT", "3306"); // May not use this
+        define("DB_NAME", "app_incontrol");
+    }
     define("CONTROL_CENTER_TBL_NAME", "control_centers");
     define("SENSOR_DATA_TBL_NAME", "sensor_data");
     define("SENSOR_INFO_TBL_NAME", "sensor_info");

@@ -10,7 +10,7 @@
         var $mysqli;
 
         function DBOperator() {
-            $this->mysqli = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+            $this->mysqli = new mysqli(DB_HOST . ":" . DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME);
             $this->create_tables();
             $this->check_mysqli_err();
         }
