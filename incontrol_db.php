@@ -15,8 +15,15 @@
             $this->check_mysqli_err();
         }
 
-        function create_tables_for_array($table_name, $arr) {
-            $sql = "CREATE TABLE IF NOT EXISTS " . 
+        function create_tables_for_array($table_name, $arr, $primary_key) {
+            if ($primary_key != NULL)
+                $sql = "CREATE TABLE IF NOT EXISTS " . 
+                    $table_name . 
+                    "(" . 
+                    implode(", ", array_combine_key_value($arr, " ")) .
+                    ", PRIMARY KEY($primary_key))";
+            else
+                $sql = "CREATE TABLE IF NOT EXISTS " . 
                     $table_name . 
                     "(" . 
                     implode(", ", array_combine_key_value($arr, " ")) .
@@ -28,9 +35,9 @@
         function create_tables() {
             global $CONTROL_CENTER_COLUMNS, $SENSOR_DATA_COLUMNS, $SENSOR_INFO_COLUMNS;
 
-            $this->create_tables_for_array(CONTROL_CENTER_TBL_NAME, $CONTROL_CENTER_COLUMNS);
-            $this->create_tables_for_array(SENSOR_DATA_TBL_NAME, $SENSOR_DATA_COLUMNS);
-            $this->create_tables_for_array(SENSOR_INFO_TBL_NAME, $SENSOR_INFO_COLUMNS);
+            $this->create_tables_for_array(CONTROL_CENTER_TBL_NAME, $CONTROL_CENTER_COLUMNS, NULL);
+            $this->create_tables_for_array(SENSOR_DATA_TBL_NAME, $SENSOR_DATA_COLUMNS, NULL);
+            $this->create_tables_for_array(SENSOR_INFO_TBL_NAME, $SENSOR_INFO_COLUMNS, SENSOR_INFO_PRIMARY_KEY);
         }
 
         function check_mysqli_err() {

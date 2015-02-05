@@ -45,5 +45,5 @@
                         "name" => "text",
                         "assoc_machine_id" => "text" // Paired host machine
                         );
-    define("SENSOR_INFO_PRIMARY_KEY", "assoc_machine_id"); // Mainly search by this
+    define("SENSOR_INFO_PRIMARY_KEY", "row_id"); // Mainly search by this
 ?>
