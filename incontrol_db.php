@@ -28,9 +28,9 @@
         function create_tables() {
             global $CONTROL_CENTER_COLUMNS, $SENSOR_DATA_COLUMNS, $SENSOR_INFO_COLUMNS;
 
-            create_tables_for_array(CONTROL_CENTER_TBL_NAME, $CONTROL_CENTER_COLUMNS);
-            create_tables_for_array(SENSOR_DATA_TBL_NAME, $SENSOR_DATA_COLUMNS);
-            create_tables_for_array(SENSOR_INFO_TBL_NAME, $SENSOR_INFO_COLUMNS);
+            $this->create_tables_for_array(CONTROL_CENTER_TBL_NAME, $CONTROL_CENTER_COLUMNS);
+            $this->create_tables_for_array(SENSOR_DATA_TBL_NAME, $SENSOR_DATA_COLUMNS);
+            $this->create_tables_for_array(SENSOR_INFO_TBL_NAME, $SENSOR_INFO_COLUMNS);
         }
 
         function check_mysqli_err() {
