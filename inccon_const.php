@@ -3,7 +3,7 @@
     define("DEVICE_TYPE_CLIENT", 2);
 
     define("REQUEST_TYPE_QUERY_SENSOR_LIST", 1);
-    define("REQUEST_TYPE_QUERY_SENSOR_INFO", 2);
+    define("REQUEST_TYPE_QUERY_SENSOR_INFO", 2); // DEPRECATED! Now return full info in list.
 
     define("STATE_NORMAL", 0); // Server is normally working, do not accept any new pair request
     define("STATE_NEW_CLIENT", 1); // Let the server accept new clients
