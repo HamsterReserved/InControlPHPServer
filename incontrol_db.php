@@ -3,8 +3,9 @@
     /* Hamster Tian @ 2015/02 */
 
     require_once('inccon_db.php');
+    require_once('inccon_const.php');
     require_once('incontrol_common.php');
-    
+
     class DBOperator {
         var $mysqli;
 
@@ -48,7 +49,7 @@
         }
 
         function add_new_device($machine_id) { // For manufacturing
-            // This is rare, no need to use prepared statment. Am I lazy?
+            // This is rare, no need to use prepared statement. Am I lazy?
             $machine_id = $mysqli->real_escape_string($machine_id);
             $sql = "INSERT INTO " . CONTROL_CENTER_TBL_NAME . " (machine_id, man_date) VALUES ('$machine_id', " . time() . ")";
             $this->mysqli->query($sql);
@@ -71,6 +72,23 @@
             $this->check_mysqli_err();
         }
 
+        function check_device_credentials($machine_id, $cred) {
+            $machine_id = $mysqli->real_escape_string($machine_id);
+            $cred = $mysqli->real_escape_string($cred);
+            $cred = crypt($cred, CRED_SALT);
+            $sql = "SELECT name FROM " . CONTROL_CENTER_TBL_NAME . " WHERE machine_id = '$machine_id' AND cred_md5 = '$cred'";
+            if ($mysqli->affected_rows <= 0)
+                return false;
+            return true;
+        }
+
+        function set_device_state($machine_id, $new_state) {
+            if (!is_numeric($new_state) || new_state < 0 || new_state > STATE_MAX) {
+                ensure_not_null(NULL, "new state should be a valid integer!");
+            }
+            // TODO
+        }
+
         function update_sensor_value($sensor_id, $machine_id, $sensor_type, $sensor_value) { // Register and update are in one function
             if (!is_numeric($sensor_type) || !is_numeric($sensor_value)) {
                 ensure_not_null(NULL, "sensor_type and sensor_value", __FUNCTION__, "should be integer!");
@@ -78,8 +96,6 @@
 
             $sensor_id = $mysqli->real_escape_string($sensor_id);
             $machine_id = $mysqli->real_escape_string($machine_id);
-            $sensor_type = $mysqli->real_escape_string($sensor_type);
-            $sensor_value = $mysqli->real_escape_string($sensor_value);
 
             $check_sql = "SELECT row_id FROM " . SENSOR_INFO_TBL_NAME . " WHERE sensor_id='$sensor_id' AND assoc_machine_id='$machine_id'";
             $check_sql_result = $this->mysqli->query($check_sql);

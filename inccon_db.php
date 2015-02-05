@@ -8,6 +8,8 @@
     define("SENSOR_DATA_TBL_NAME", "sensor_data");
     define("SENSOR_INFO_TBL_NAME", "sensor_info");
 
+    define("CRED_SALT", "stub_salt");
+
     $CONTROL_CENTER_COLUMNS = array(
                         "machine_id" => "text", // Device ID
                         "man_date" => "int", // Manufacturing date
