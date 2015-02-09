@@ -55,54 +55,62 @@
             }
         }
 
+        /************************** Setters *******************************/
+
         function add_new_device($machine_id) { // For manufacturing
             // This is rare, no need to use prepared statement. Am I lazy?
-            $machine_id = $mysqli->real_escape_string($machine_id);
+            $machine_id = $this->mysqli->real_escape_string($machine_id);
             $sql = "INSERT INTO " . CONTROL_CENTER_TBL_NAME . " (machine_id, man_date) VALUES ('$machine_id', " . time() . ")";
             $this->mysqli->query($sql);
             $this->check_mysqli_err();
         }
 
         function register_device($machine_id, $device_name) { // For users first use of a device
-            $machine_id = $mysqli->real_escape_string($machine_id);
-            $device_name = $mysqli->real_escape_string($device_name);
+            $machine_id = $this->mysqli->real_escape_string($machine_id);
+            $device_name = $this->mysqli->real_escape_string($device_name);
             $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " SET name = '$device_name', reg_date = " . time() . " WHERE machine_id = '$machine_id'";
             $this->mysqli->query($sql);
             $this->check_mysqli_err(); // TODO Shall we expose machine_id not found error to normal user?
         }
 
         function set_device_name($machine_id, $device_name) { // Nearly same as above, except we don't set reg_date
-            $machine_id = $mysqli->real_escape_string($machine_id);
-            $device_name = $mysqli->real_escape_string($device_name);
+            $machine_id = $this->mysqli->real_escape_string($machine_id);
+            $device_name = $this->mysqli->real_escape_string($device_name);
             $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " SET name = '$device_name' WHERE machine_id = '$machine_id'";
             $this->mysqli->query($sql);
             $this->check_mysqli_err();
         }
 
         function check_device_credentials($machine_id, $cred) {
-            $machine_id = $mysqli->real_escape_string($machine_id);
-            $cred = $mysqli->real_escape_string($cred);
+            $machine_id = $this->mysqli->real_escape_string($machine_id);
+            $cred = $this->mysqli->real_escape_string($cred);
             $cred = crypt($cred, CRED_SALT);
             $sql = "SELECT name FROM " . CONTROL_CENTER_TBL_NAME . " WHERE machine_id = '$machine_id' AND cred_md5 = '$cred'";
-            if ($mysqli->affected_rows <= 0)
+            if ($this->mysqli->affected_rows <= 0)
                 return false;
             return true;
         }
 
         function set_device_state($machine_id, $new_state) {
             if (!is_numeric($new_state) || new_state < 0 || new_state > STATE_MAX) {
-                ensure_not_null(NULL, "new state should be a valid integer!");
+                ensure_not_null(NULL, "new state should be a valid integer!", __FUNCTION__, "");
             }
-            // TODO
+            $machine_id = $this->mysqli->real_escape_string($machine_id);
+            $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " SET state = $new_name WHERE machine_id = '$machine_id'";
+            $this->mysqli->query($sql);
+            $this->check_mysqli_err();
+            
+            if ($this->mysqli->affected_rows < 1)
+                ensure_not_null(NULL, "State set failed", __FUNCTION__, "");
         }
 
-        function update_sensor_value($sensor_id, $machine_id, $sensor_type, $sensor_value) { // Register and update are in one function
+        function set_sensor_value($sensor_id, $machine_id, $sensor_type, $sensor_value) { // Register and update are in one function
             if (!is_numeric($sensor_type) || !is_numeric($sensor_value)) {
                 ensure_not_null(NULL, "sensor_type and sensor_value", __FUNCTION__, "should be integer!");
             }
 
-            $sensor_id = $mysqli->real_escape_string($sensor_id);
-            $machine_id = $mysqli->real_escape_string($machine_id);
+            $sensor_id = $this->mysqli->real_escape_string($sensor_id);
+            $machine_id = $this->mysqli->real_escape_string($machine_id);
 
             $check_sql = "SELECT row_id FROM " . SENSOR_INFO_TBL_NAME . " WHERE sensor_id='$sensor_id' AND assoc_machine_id='$machine_id'";
             $check_sql_result = $this->mysqli->query($check_sql);
@@ -124,9 +132,9 @@
             $this->check_mysqli_err();
         }
 
-        function set_sensor_name($sensor_id, $machine_id, $new_name) {
-            $sensor_id = $mysqli->real_escape_string($sensor_id);
-            $machine_id = $mysqli->real_escape_string($machine_id);
+        function set_sensor_name($sensor_id, $machine_id, $new_name) { // Am I implementing this too complex?
+            $sensor_id = $this->mysqli->real_escape_string($sensor_id);
+            $machine_id = $this->mysqli->real_escape_string($machine_id);
 
             $check_sql = "SELECT row_id FROM " . SENSOR_INFO_TBL_NAME . " WHERE sensor_id='$sensor_id' AND assoc_machine_id='$machine_id'";
             $check_sql_result = $this->mysqli->query($check_sql);
@@ -141,6 +149,83 @@
                 $this->mysqli->query($update_sql);
                 $this->check_mysqli_err();
             }
+        }
+        
+        function set_sensor_trigger($sensor_id, $machine_id, $trg) { // No error response?
+            $sensor_id = $this->mysqli->real_escape_string($sensor_id);
+            $machine_id = $this->mysqli->real_escape_string($machine_id);
+            $trg = $this->mysqli->real_escape_string($trg);
+            
+            $sql = "UPDATE " . SENSOR_INFO_TBL_NAME . " SET triggers = '$trg' WHERE machine_id = '$machine_id' AND sensor_id = '$sensor_id'";
+            $this->mysqli->query($sql);
+            $this->check_mysqli_err();
+            
+            if ($this->mysqli->affected_rows < 1)
+                ensure_not_null(NULL, "Trigger set failed", __FUNCTION__, "");
+        }
+
+        /************************** Getters *******************************/
+        function get_device_info($machine_id) { // Be sure you checked credentials first!
+            $machine_id = $this->mysqli->real_escape_string($machine_id);
+            $sql = "SELECT * FROM " . CONTROL_CENTER_TBL_NAME . " WHERE machine_id = '$machine_id'";
+            $result = $this->mysqli->query($sql);
+            $this->check_mysqli_err();
+            
+            if ($this->mysqli->affected_rows != 1) // ONLY one match is allowed
+                ensure_not_null(NULL, "Get info failed", __FUNCTION__, "");
+            return $result->fetch_assoc(); // One line only
+        }
+
+        function get_sensor_info($sensor_id, $assoc_machine_id) {
+            return get_sensor_data_history($sensor_id, $assoc_machine_id, 1);
+        }
+        
+        /**
+         * Return format:
+         * when count=1 {id, name, type, date, value}
+         * when count>1 {{date,value}, {date,value},...}
+         */
+        function get_sensor_data_history($sensor_id, $assoc_machine_id, $count) {
+            if (!is_numeric($count))
+                ensure_not_null(NULL, "count has to be an integer!", __FUNCTION__, "");
+            
+            $assoc_machine_id = $this->mysqli->real_escape_string($assoc_machine_id);
+            $sensor_id = $this->mysqli->real_escape_string($sensor_id);
+            
+            // Basic info (name, type, place in data table)
+            $sql = "SELECT * FROM " . SENSOR_INFO_TBL_NAME . " WHERE sensor_id = '$sensor_id' AND assoc_machine_id = '$assoc_machine_id'";
+            $result = $this->mysqli->query($sql);
+            $this->check_mysqli_err();
+            
+            $info_array = $result->fetch_assoc();
+            $row_id = $info_array["row_id"];
+            
+            // Latest data
+            $value_sql = "SELECT * FROM " . SENSOR_DATA_TBL_NAME . " WHERE data_row_id = $row_id ORDER BY date DESC LIMIT $count";
+            $value_result = $this->mysqli->query($value_sql);
+            $this->check_mysqli_err();
+            
+            $real_rows = min($count, $this->mysqli->affected_rows);
+            if ($real_rows < 1)
+                ensure_not_null(NULL, "No data in db", __FUNCTION__,"");
+            else if ($real_rows == 1) {
+                $value_array = $value_result->fetch_assoc()
+                $return_array[] = array(
+                            "sensor_id" => $sensor_id,
+                            "sensor_type" => $info_array["type"],
+                            "sensor_name" => $info_array["name"],
+                            "sensor_date" => $value_array["date"],
+                            "sensor_value" => $value_array["value"]
+                            );
+            } else {
+                while($value_array = $value_result->fetch_assoc()) {
+                    $return_array[] = array(
+                                "sensor_date" => $value_array["date"],
+                                "sensor_value" => $value_array["value"]
+                                );
+                }
+            }
+            return $return_array;
         }
     }
 ?>
