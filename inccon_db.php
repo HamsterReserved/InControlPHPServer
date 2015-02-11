@@ -42,8 +42,8 @@
                         "sensor_id" => "text",
                         "type" => "int",
                         "name" => "text",
-                        "assoc_machine_id" => "text" // Paired host machine
-                        "triggers" => "text", // Send SMS etc
+                        "assoc_machine_id" => "text", // Paired host machine
+                        "triggers" => "text" // Send SMS etc
                         );
     define("SENSOR_INFO_PRIMARY_KEY", "row_id"); // Mainly search by this
 ?>

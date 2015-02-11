@@ -206,10 +206,11 @@
             $this->check_mysqli_err();
             
             $real_rows = min($count, $this->mysqli->affected_rows);
+            $return_array = array();
             if ($real_rows < 1)
                 ensure_not_null(NULL, "No data in db", __FUNCTION__,"");
             else if ($real_rows == 1) {
-                $value_array = $value_result->fetch_assoc()
+                $value_array = $value_result->fetch_assoc();
                 $return_array[] = array(
                             "sensor_id" => $sensor_id,
                             "sensor_type" => $info_array["type"],
