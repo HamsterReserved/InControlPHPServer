@@ -24,12 +24,11 @@
  *  And note that 0 == NULL == "0" here!
  */
     require_once('inccon_const.php');
-    require_once('inccon_config.php'); // Configuration file. Note this is not a function!
+    require_once('inccon_config.php'); // Configuration file
 
-    require_once('incontrol_common.php');
+    require_once('incontrol_common.php'); // Common helper functions
     require_once('incontrol_db.php'); // DBOperator class
 
-    $dboperator = new dboperator();
     switch ($_GET['device_type']) {
         case DEVICE_TYPE_SERVER:
             process_server_request();
@@ -43,7 +42,7 @@
     // Main page ends here.
     
     function process_server_request() {
-        $device_id = $_GET['device_id'];
+        /* $device_id = $_GET['device_id'];
         $credentials = $_GET['credentials'];
         $sensor_id = $_GET['sensor_id'];
         $sensor_info = $_GET['sensor_info'];
@@ -53,48 +52,50 @@
         ensure_not_null($sensor_id, "sensor_id", __FUNCTION__);
         ensure_not_null($sensor_info, "sensor_info", __FUNCTION__);
         ensure_not_null($info_date, "info_date", __FUNCTION__);
+        */
+        $req_type = check_get_http_param('request_type', __FUNCTION__, NULL);
+        check_credentials();
         
-        check_credentials($credentials);
-        
-        if (OFFLINE_TEST)
+        if (OFFLINE_TEST) {
             echo "OK";
-        else {
-            // TODO: Do something here. Write to database, validate device ID, return result etc.
+            exit();
         }
-    }
-    
-    function process_client_request() {
-        global $REQUEST_TYPE_QUERY_SENSOR_LIST, $REQUEST_TYPE_QUERY_SENSOR_INFO;
-        
-        $device_id = $_GET['device_id'];
-        $request_type = $_GET['request_type'];
-        $credentials = $_GET['credentials'];
-        $sensor_id = $_GET['sensor_id'];
-        $info_date = $_GET['info_date'];
-        
-        ensure_not_null($device_id, "device_id", __FUNCTION__);
-        ensure_not_null($request_type, "request_type", __FUNCTION__);
-        
-        check_credentials($credentials);
-
-        switch ($request_type) {
-            case REQUEST_TYPE_QUERY_SENSOR_LIST:
-                respond_sensor_list($device_id);
+        // TODO: Do something here. Write to database, validate device ID, return result etc.
+        switch ($req_type) {
+            case REQUEST_TYPE_DATA_REPORT:
                 break;
-            default:
+            case REQUEST_TYPE_SWITCH_STATE:
+                break;
+            case REQUEST_TYPE_USER_REGISTRATION:
+                break;
+            case REQUEST_TYPE_FACTORY_REGISTRATION:
+                break;
+             default:
                 ensure_not_null(NULL, "request_type", __FUNCTION__, " submitted is unknown!");
         }
     }
     
-    function respond_sensor_list($device_id) {
-        global $TEST_SENSOR_LIST_RESPONSE;
-        
-        ensure_not_null($device_id, "device_id", __FUNCTION__);
-        //TODO: Send request to control center (shall we accomplish this by SMS?)
-        if (OFFLINE_TEST)
-            if ($device_id == "1")
-                echo $TEST_SENSOR_LIST_RESPONSE;
-            else
-                ensure_not_null(NULL, "device_id", __FUNCTION__, " unknown!");
+    function process_client_request() {
+        check_credentials($credentials);
+
+        $req_type = check_get_http_param('request_type', __FUNCTION__, NULL);
+
+        switch ($request_type) {
+            case REQUEST_TYPE_QUERY_SENSOR_LIST:
+                respond_sensor_list();
+                break;
+            case REQUEST_TYPE_QUERY_SENSOR_HISTORY:
+                respond_sensor_history();
+                break;
+            case REQUEST_TYPE_QUERY_DEVICE_INFO:
+                respond_device_info();
+                break;
+            case REQUEST_TYPE_SET_DEVICE_NAME:
+                break;
+            case REQUEST_TYPE_SET_SENSOR_TRIGGER:
+                break;
+            default:
+                ensure_not_null(NULL, "request_type", __FUNCTION__, " submitted is unknown!");
+        }
     }
 ?>

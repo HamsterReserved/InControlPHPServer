@@ -181,6 +181,7 @@
         }
         
         /**
+         * Query a known and signal sensor's data
          * Return format:
          * when count=1 {id, name, type, date, value}
          * when count>1 {{date,value}, {date,value},...}
@@ -227,6 +228,26 @@
                 }
             }
             return $return_array;
+        }
+        
+        /**
+         * Return {{_id, _name, _type, _value, _date}, {...}}
+         */
+        function get_sensor_list($machine_id) {
+            $assoc_machine_id = $this->mysqli->real_escape_string($assoc_machine_id);
+            
+            $sql = "SELECT * FROM " . SENSOR_INFO_TBL_NAME . " WHERE assoc_machine_id = '$machine_id'";
+            $result = $this->mysqli->query($sql);
+            $this->check_mysqli_err();
+            
+            if ($this->mysqli->affected_rows <= 1)
+                return NULL;
+            
+            $ret_array = array();
+            while ($row = $this->mysqli->fetch_assoc()) {
+                $ret_array[] = $this->get_sensor_data_history($row['row_id'], $machine_id, 1);
+            }
+            return $ret_array;
         }
     }
 ?>

@@ -19,7 +19,7 @@
             }
     }
 
-    function check_credentials($credentials) {
+    function check_credentials() {
         // TODO: Do check things here, such as NULL and not match, then die or not
         if (CREDENTIALS_ENABLED || OFFLINE_TEST)
             return true;
@@ -32,6 +32,12 @@
         foreach($arr as $key=>$value) {
             $ret[]="$key$delim$value";
         }
+        return $ret;
+    }
+
+    function check_get_http_param($param_name, $func, $prompt) {
+        $ret = $_GET[$param_name];
+        ensure_not_null($ret, $prompt, $func, NULL);
         return $ret;
     }
 ?>
