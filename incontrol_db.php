@@ -57,10 +57,10 @@
 
         /************************** Setters *******************************/
 
-        function add_new_device($machine_id) { // For manufacturing
+        function add_new_device($machine_id) { // For manufacturing, use a default name: InControl
             // This is rare, no need to use prepared statement. Am I lazy?
             $machine_id = $this->mysqli->real_escape_string($machine_id);
-            $sql = "INSERT INTO " . CONTROL_CENTER_TBL_NAME . " (machine_id, man_date) VALUES ('$machine_id', " . time() . ")";
+            $sql = "INSERT INTO " . CONTROL_CENTER_TBL_NAME . " (machine_id, man_date, state, name) VALUES ('$machine_id', " . time() . ", " . STATE_NORMAL . ", 'InControl')";
             $this->mysqli->query($sql);
             $this->check_mysqli_err(__FUNCTION__);
         }
@@ -68,9 +68,19 @@
         function register_device($machine_id, $device_name) { // For users first use of a device
             $machine_id = $this->mysqli->real_escape_string($machine_id);
             $device_name = $this->mysqli->real_escape_string($device_name);
-            $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " SET name = '$device_name', reg_date = " . time() . " WHERE machine_id = '$machine_id'";
+            if ($device_name != NULL) {
+                $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " SET name = '$device_name', reg_date = " . time() . 
+                   " WHERE machine_id = '$machine_id' AND state = " . STATE_NEW_DEVICE;
+            } else {
+                $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " reg_date = " . time() . 
+                   " WHERE machine_id = '$machine_id' AND state = " . STATE_NEW_DEVICE;
+            }
             $this->mysqli->query($sql);
             $this->check_mysqli_err(__FUNCTION__); // TODO Shall we expose machine_id not found error to normal user?
+            if ($this->mysqli->affected_rows != 1) {
+                ensure_not_null(NULL, NULL, __FUNCTION__ . " given InControl Controller ID is not found!", NULL);
+                // This is so important that we expose this to user.
+            }
         }
 
         function set_device_name($machine_id, $device_name) { // Nearly same as above, except we don't set reg_date
@@ -104,8 +114,8 @@
                 ensure_not_null(NULL, "State set failed", __FUNCTION__, "");
         }
 
-        function set_sensor_value($sensor_id, $machine_id, $sensor_type, $sensor_value) { // Register and update are in one function
-            if (!is_numeric($sensor_type) || !is_numeric($sensor_value)) {
+        function set_sensor_value($sensor_id, $machine_id, $sensor_type, $sensor_value, $upd_date) { // Register and update are in one function
+            if (!is_numeric($sensor_type) || !is_numeric($sensor_value) || !is_numeric($upd_date)) {
                 ensure_not_null(NULL, "sensor_type and sensor_value", __FUNCTION__, "should be integer!");
             }
 
@@ -127,7 +137,7 @@
             $check_sql_result->close();
 
             $insert_data_sql = "INSERT INTO " . SENSOR_DATA_TBL_NAME . " (data_row_id, date, value) VALUES ".
-                        "($row_id, " . time() . ", $sensor_value)";
+                        "($row_id, $upd_date, $sensor_value)";
             $this->mysqli->query($insert_data_sql);
             $this->check_mysqli_err(__FUNCTION__);
         }

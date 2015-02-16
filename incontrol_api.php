@@ -1,7 +1,7 @@
 <?php
 /**
  * InControl API
- * Parameters: (SEE constants.php)
+ * Parameters: (All possible parameters are listed here. See constants.php and corresponding function for specific command)
  *  device_type : 1 - Server (sensor, home control center)
  *                2 - Client (Mobile devices, tablets, computers)
  *                Required for every request, of course.
@@ -9,13 +9,14 @@
  *              Required for each request.
  *  request_type : The purpose of this request by client.
  *                 1 - Query what sensor is connected to control center
- *                 2 - Query sensors info
- *                 3 - Update sensor name etc
- *                 Other values are reserved.
+ *                 (DEPRECATED) 2 - Query sensors info
+ *                 Check inccon_const.php for more types.
  *                 Required for client only.
- *  credentials : Self-explanatory. (IF ADDED PROPERLY) Required for each request.
+ *  credentials : Self-explanatory. (IF IMPLEMENTED PROPERLY) Required for each request.
+ *                Should be something like hidden mysterious ID hardcoded into Flash ROM for server.
+ *                Should be user specified string for client queries. When 1st set-up, should be written on device screen.
  *  sensor_id : Required for server reporting data. Optional for client.
- *  sensor_info : Self-explanatory. Required for server only.
+ *  sensor_value : Self-explanatory. Required for server only.
  *  info_date : For server: time of this status update (from board RTC)
  *              For client: last fetched date (so won't fetch repeat data. Client should take care of repeated things though)
  *
@@ -28,6 +29,8 @@
 
     require_once('incontrol_common.php'); // Common helper functions
     require_once('incontrol_db.php'); // DBOperator class
+    require_once('incontrol_client_req.php');
+    require_once('incontrol_server_req.php');
 
     switch ($_GET['device_type']) {
         case DEVICE_TYPE_SERVER:
@@ -60,15 +63,19 @@
             echo "OK";
             exit();
         }
-        // TODO: Do something here. Write to database, validate device ID, return result etc.
+
         switch ($req_type) {
             case REQUEST_TYPE_DATA_REPORT:
+                respond_data_report();
                 break;
             case REQUEST_TYPE_SWITCH_STATE:
+                respond_switch_state();
                 break;
             case REQUEST_TYPE_USER_REGISTRATION:
+                respond_user_registration();
                 break;
             case REQUEST_TYPE_FACTORY_REGISTRATION:
+                respond_factory_registration();
                 break;
              default:
                 ensure_not_null(NULL, "request_type", __FUNCTION__, " submitted is unknown!");
