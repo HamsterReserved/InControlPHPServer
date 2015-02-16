@@ -12,7 +12,7 @@
         function DBOperator() {
             $this->mysqli = new mysqli(DB_HOST . ":" . DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME);
             $this->create_tables();
-            $this->check_mysqli_err(__FUNCTION__);
+            $this->check_mysqli_err(__FUNCTION__, false);
         }
 
         function create_tables_for_array($table_name, $arr, $primary_key) {
@@ -29,7 +29,7 @@
                     implode(", ", array_combine_key_value($arr, " ")) .
                     ")";
             $this->mysqli->query($sql);
-            $this->check_mysqli_err(__FUNCTION__);
+            $this->check_mysqli_err(__FUNCTION__, false);
         }
 
         function create_tables() {
@@ -40,7 +40,7 @@
             $this->create_tables_for_array(SENSOR_INFO_TBL_NAME, $SENSOR_INFO_COLUMNS, SENSOR_INFO_PRIMARY_KEY);
         }
 
-        function check_mysqli_err($func) {
+        function check_mysqli_err($func ,$check_for_affected_rows = true) {
             if ($this->mysqli->connect_errno != 0) {
                     ensure_not_null(NULL, 
                             "DB Connection Failed with ", 
@@ -52,6 +52,10 @@
                             "DB Operation Failed with ", 
                             $func, 
                             "error " . $this->mysqli->error . " (" . $this->mysqli->errno . ")");
+            }
+            
+            if ($check_for_affected_rows && $this->mysqli->affected_rows < 1) {
+                ensure_not_null(NULL, NULL, $func, "set failed");
             }
         }
 
@@ -78,10 +82,6 @@
             }
             $this->mysqli->query($sql);
             $this->check_mysqli_err(__FUNCTION__); // TODO Shall we expose machine_id not found error to normal user?
-            if ($this->mysqli->affected_rows != 1) {
-                ensure_not_null(NULL, NULL, __FUNCTION__ . " given InControl Controller ID is not found!", NULL);
-                // This is so important that we expose this to user.
-            }
         }
 
         function set_device_name($machine_id, $device_name) { // Nearly same as above, except we don't set reg_date
@@ -103,7 +103,7 @@
         }
 
         function set_device_state($machine_id, $new_state) {
-            if (!is_numeric($new_state) || new_state < 0 || new_state > STATE_MAX) {
+            if (!is_numeric($new_state) || $new_state < 0 || $new_state > STATE_MAX) {
                 ensure_not_null(NULL, "new state should be a valid integer!", __FUNCTION__, "");
             }
             $machine_id = $this->mysqli->real_escape_string($machine_id);
@@ -170,7 +170,7 @@
             $machine_id = $this->mysqli->real_escape_string($machine_id);
             $trg = $this->mysqli->real_escape_string($trg);
             
-            $sql = "UPDATE " . SENSOR_INFO_TBL_NAME . " SET triggers = '$trg' WHERE machine_id = '$machine_id' AND sensor_id = '$sensor_id'";
+            $sql = "UPDATE " . SENSOR_INFO_TBL_NAME . " SET triggers = '$trg' WHERE assoc_machine_id = '$machine_id' AND sensor_id = '$sensor_id'";
             $this->mysqli->query($sql);
             $this->check_mysqli_err(__FUNCTION__);
             
@@ -185,8 +185,6 @@
             $result = $this->mysqli->query($sql);
             $this->check_mysqli_err(__FUNCTION__);
             
-            if ($this->mysqli->affected_rows != 1) // ONLY one match is allowed
-                ensure_not_null(NULL, "Get info failed", __FUNCTION__, "");
             return $result->fetch_assoc(); // One line only
         }
 
@@ -218,7 +216,7 @@
             // Latest data
             $value_sql = "SELECT * FROM " . SENSOR_DATA_TBL_NAME . " WHERE data_row_id = $row_id ORDER BY date DESC LIMIT $count";
             $value_result = $this->mysqli->query($value_sql);
-            $this->check_mysqli_err(__FUNCTION__);
+            $this->check_mysqli_err(__FUNCTION__, false); // No need to stop here. We have custom null handling below.
             
             $real_rows = min($count, $this->mysqli->affected_rows);
             if ($real_rows < 1)
@@ -247,10 +245,10 @@
         /**
          * Return {{_id, _name, _type, _value, _date}, {...}}
          */
-        function get_sensor_list($machine_id) {
+        function get_sensor_list($assoc_machine_id) {
             $assoc_machine_id = $this->mysqli->real_escape_string($assoc_machine_id);
             
-            $sql = "SELECT * FROM " . SENSOR_INFO_TBL_NAME . " WHERE assoc_machine_id = '$machine_id'";
+            $sql = "SELECT * FROM " . SENSOR_INFO_TBL_NAME . " WHERE assoc_machine_id = '$assoc_machine_id'";
             $result = $this->mysqli->query($sql);
             $this->check_mysqli_err(__FUNCTION__);
             
@@ -259,7 +257,7 @@
             
             $ret_array = array();
             while ($row = $result->fetch_assoc()) {
-                $ret_array[] = $this->get_sensor_data_history($row['row_id'], $machine_id, 1);
+                $ret_array[] = $this->get_sensor_data_history($row['sensor_id'], $assoc_machine_id, 1);
             }
             return $ret_array;
         }

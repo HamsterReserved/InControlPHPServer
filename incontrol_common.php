@@ -21,7 +21,7 @@
 
     function check_credentials() {
         // TODO: Do check things here, such as NULL and not match, then die or not
-        if (CREDENTIALS_ENABLED || OFFLINE_TEST)
+        if (!(CREDENTIAL_ENABLED) || OFFLINE_TEST)
             return true;
         else
             ensure_not_null(NULL, "cred", __FUNCTION__, "does not comply!");

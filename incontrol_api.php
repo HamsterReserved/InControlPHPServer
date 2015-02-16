@@ -45,17 +45,6 @@
     // Main page ends here.
     
     function process_server_request() {
-        /* $device_id = $_GET['device_id'];
-        $credentials = $_GET['credentials'];
-        $sensor_id = $_GET['sensor_id'];
-        $sensor_info = $_GET['sensor_info'];
-        $info_date = $_GET['info_date'];
-        
-        ensure_not_null($device_id, "device_id", __FUNCTION__);
-        ensure_not_null($sensor_id, "sensor_id", __FUNCTION__);
-        ensure_not_null($sensor_info, "sensor_info", __FUNCTION__);
-        ensure_not_null($info_date, "info_date", __FUNCTION__);
-        */
         $req_type = check_get_http_param('request_type', __FUNCTION__, NULL);
         check_credentials();
         
@@ -83,7 +72,7 @@
     }
     
     function process_client_request() {
-        check_credentials($credentials);
+        check_credentials();
 
         $req_type = check_get_http_param('request_type', __FUNCTION__, NULL);
 
