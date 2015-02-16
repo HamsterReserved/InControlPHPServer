@@ -2,6 +2,9 @@
     define("DEVICE_TYPE_SERVER", 1);
     define("DEVICE_TYPE_CLIENT", 2);
 
+    define("SENSOR_DEFAULT_NAME", "Sensor");
+    define("DEVICE_DEFAULT_NAME", "InControl");
+
     define("REQUEST_TYPE_SET_BASE", 100);
 
     /******** Client requests *********/

@@ -30,14 +30,14 @@
         if (!is_null($info_arr))
             echo(json_encode($info_arr));
         else
-            echo("{}");
+            echo("[]"); // Empty json array
     }
     
     // api.php?device_id=&device_type=&credentials=&request_type=&sensor_id=&count=
     // Return: see incontrol_db.php/get_sensor_data_history
     function respond_sensor_history() {
         $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
-        $count = check_get_http_param('count', __FUNCTION__, NULL)
+        $count = check_get_http_param('count', __FUNCTION__, NULL);
         $sensor_id = check_get_http_param('sensor_id', __FUNCTION__, NULL);
         
         // TODO: Offline test?

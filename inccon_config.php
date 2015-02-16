@@ -4,7 +4,7 @@
 
     define("CREDENTIAL_ENABLED", false);
     define("DEBUG", true); // More debug info when error
-    define("OFFLINE_TEST", true); // No database enabled, pass credential test
+    define("OFFLINE_TEST", false); // No database enabled, pass credential test
 
     // Tests
     $TEST_SENSOR_LIST = array(array("sensor_id" => 1, "sensor_name" => "Test Sensor 1", "sensor_type" => SENSOR_TYPE_MOTION, "sensor_info" => 115,

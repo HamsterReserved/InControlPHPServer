@@ -87,7 +87,7 @@
 
         $req_type = check_get_http_param('request_type', __FUNCTION__, NULL);
 
-        switch ($request_type) {
+        switch ($req_type) {
             case REQUEST_TYPE_QUERY_SENSOR_LIST:
                 respond_sensor_list();
                 break;

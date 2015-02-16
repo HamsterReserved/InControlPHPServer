@@ -60,7 +60,8 @@
         function add_new_device($machine_id) { // For manufacturing, use a default name: InControl
             // This is rare, no need to use prepared statement. Am I lazy?
             $machine_id = $this->mysqli->real_escape_string($machine_id);
-            $sql = "INSERT INTO " . CONTROL_CENTER_TBL_NAME . " (machine_id, man_date, state, name) VALUES ('$machine_id', " . time() . ", " . STATE_NORMAL . ", 'InControl')";
+            $sql = "INSERT INTO " . CONTROL_CENTER_TBL_NAME . " (machine_id, man_date, state, name) " . 
+                   "VALUES ('$machine_id', " . time() . ", " . STATE_NORMAL . ", '" . DEVICE_DEFAULT_NAME . "')";
             $this->mysqli->query($sql);
             $this->check_mysqli_err(__FUNCTION__);
         }
@@ -70,10 +71,10 @@
             $device_name = $this->mysqli->real_escape_string($device_name);
             if ($device_name != NULL) {
                 $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " SET name = '$device_name', reg_date = " . time() . 
-                   " WHERE machine_id = '$machine_id' AND state = " . STATE_NEW_DEVICE;
+                   " WHERE machine_id = '$machine_id' AND state = " . STATE_NEW_CLIENT;
             } else {
-                $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " reg_date = " . time() . 
-                   " WHERE machine_id = '$machine_id' AND state = " . STATE_NEW_DEVICE;
+                $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " SET reg_date = " . time() . 
+                   " WHERE machine_id = '$machine_id' AND state = " . STATE_NEW_CLIENT;
             }
             $this->mysqli->query($sql);
             $this->check_mysqli_err(__FUNCTION__); // TODO Shall we expose machine_id not found error to normal user?
@@ -106,7 +107,7 @@
                 ensure_not_null(NULL, "new state should be a valid integer!", __FUNCTION__, "");
             }
             $machine_id = $this->mysqli->real_escape_string($machine_id);
-            $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " SET state = $new_name WHERE machine_id = '$machine_id'";
+            $sql = "UPDATE " . CONTROL_CENTER_TBL_NAME . " SET state = $new_state, last_state_date = " . time() . " WHERE machine_id = '$machine_id'";
             $this->mysqli->query($sql);
             $this->check_mysqli_err(__FUNCTION__);
             
@@ -114,19 +115,22 @@
                 ensure_not_null(NULL, "State set failed", __FUNCTION__, "");
         }
 
-        function set_sensor_value($sensor_id, $machine_id, $sensor_type, $sensor_value, $upd_date) { // Register and update are in one function
+        function set_sensor_value($sensor_id, $machine_id, $sensor_type, $sensor_value, $upd_date, $sensor_name) { // Register and update are in one function
             if (!is_numeric($sensor_type) || !is_numeric($sensor_value) || !is_numeric($upd_date)) {
                 ensure_not_null(NULL, "sensor_type and sensor_value", __FUNCTION__, "should be integer!");
             }
 
             $sensor_id = $this->mysqli->real_escape_string($sensor_id);
             $machine_id = $this->mysqli->real_escape_string($machine_id);
+            $sensor_name = $this->mysqli->real_escape_string($sensor_name);
+
+            if ($sensor_name == NULL) $sensor_name = SENSOR_DEFAULT_NAME; // Default name for 1st reg
 
             $check_sql = "SELECT row_id FROM " . SENSOR_INFO_TBL_NAME . " WHERE sensor_id='$sensor_id' AND assoc_machine_id='$machine_id'";
             $check_sql_result = $this->mysqli->query($check_sql);
             if ($this->mysqli->affected_rows == 0) { // This sensor hasn't been registered yet, register now.
-                $create_sql = "INSERT INTO " . SENSOR_INFO_COLUMNS . " (sensor_id, assoc_machine_id, type, value) VALUES " .
-                        "('$sensor_id', '$machine_id', $sensor_type, $sensor_value)";
+                $create_sql = "INSERT INTO " . SENSOR_INFO_TBL_NAME . " (sensor_id, assoc_machine_id, type, name) VALUES " .
+                        "('$sensor_id', '$machine_id', $sensor_type, '$sensor_name')";
                 $this->mysqli->query($create_sql);
                 $this->check_mysqli_err(__FUNCTION__);
                 $row_id = $this->mysqli->insert_id;
@@ -217,12 +221,11 @@
             $this->check_mysqli_err(__FUNCTION__);
             
             $real_rows = min($count, $this->mysqli->affected_rows);
-            $return_array = array();
             if ($real_rows < 1)
                 ensure_not_null(NULL, "No data in db", __FUNCTION__,"");
             else if ($real_rows == 1) {
                 $value_array = $value_result->fetch_assoc();
-                $return_array[] = array(
+                $return_array = array(
                             "sensor_id" => $sensor_id,
                             "sensor_type" => $info_array["type"],
                             "sensor_name" => $info_array["name"],
@@ -230,6 +233,7 @@
                             "sensor_value" => $value_array["value"]
                             );
             } else {
+                $return_array = array();
                 while($value_array = $value_result->fetch_assoc()) {
                     $return_array[] = array(
                                 "sensor_date" => $value_array["date"],
@@ -250,11 +254,11 @@
             $result = $this->mysqli->query($sql);
             $this->check_mysqli_err(__FUNCTION__);
             
-            if ($this->mysqli->affected_rows <= 1)
+            if ($this->mysqli->affected_rows < 1)
                 return NULL;
             
             $ret_array = array();
-            while ($row = $this->mysqli->fetch_assoc()) {
+            while ($row = $result->fetch_assoc()) {
                 $ret_array[] = $this->get_sensor_data_history($row['row_id'], $machine_id, 1);
             }
             return $ret_array;

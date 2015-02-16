@@ -7,7 +7,7 @@
         if ($prompt_msg == NULL)
             $prompt_msg = " not defined!"; // TODO: Is this needed or just take this as default value?
         
-        if ($var_to_check == NULL)
+        if ($var_to_check == NULL) {
             header('HTTP/1.1 501 Not implemented');
             header("status: 501 Not implemented");
             if (DEBUG) {
@@ -16,6 +16,7 @@
                 $err_desc_array = array("error_msg" => $function_name);
             }
             die(json_encode($err_desc_array));
+        }
     }
 
     function check_credentials() {

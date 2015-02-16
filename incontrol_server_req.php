@@ -18,9 +18,10 @@
         $sensor_value = check_get_http_param('sensor_value', __FUNCTION__, NULL);
         $info_date = check_get_http_param('info_date', __FUNCTION__, NULL);
         $sensor_type = check_get_http_param('sensor_type', __FUNCTION__, NULL);
+        $sensor_name = $_GET['sensor_name']; // Not mandatory. This is needed for 1st registration (sent by perp device)
         
         $db = new DBOperator();
-        $db->set_sensor_value($sensor_id, $device_id, $sensor_type, $sensor_value, $info_date);
+        $db->set_sensor_value($sensor_id, $device_id, $sensor_type, $sensor_value, $info_date, $sensor_name);
         echo("OK");
     }
     
@@ -38,7 +39,6 @@
     // If name is empty, original name will be preserved
     function respond_user_registration() {
         $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
-        $name = check_get_http_param('name', __FUNCTION__, NULL);
         
         $db = new DBOperator();
         $db->register_device($device_id, $name);
