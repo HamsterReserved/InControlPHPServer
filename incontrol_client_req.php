@@ -53,7 +53,45 @@
         $db = new DBOperator();
         $result = $db->get_device_info($device_id);
         
-        $ret_array = array("device_id" => $device_id, "device_name"=>$result['name'], "man_date"=>$result['man_date'], "reg_date"=>$result['reg_date']);
+        $ret_array = array("device_id" => $device_id,
+                           "device_name"=>$result['name'],
+                           "man_date"=>$result['man_date'],
+                           "reg_date"=>$result['reg_date']);
         echo(json_encode($ret_array));
+    }
+    
+    // api.php?device_id=&device_type=&credentials=&request_type=&name=(BASE64)
+    // Return: {result:ok} {error_msg:xxx}(with HTTP 501) The latter is generated in ensure_not_null
+    function respond_set_device_name() {
+        $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
+        $name = check_get_http_param('name', __FUNCTION__, NULL);
+        
+        $db = new DBOperator();
+        $db->set_device_name($device_id, base64_decode($name));
+        echo(json_encode(array("result" => "ok")));
+    }
+    
+    // api.php?device_id=&device_type=&credentials=&request_type=&trigger=(BASE64)&sensor_id=
+    // Return: {result:ok} {error_msg:xxx}(with HTTP 501) The latter is generated in ensure_not_null
+    function respond_set_sensor_trigger() {
+        $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
+        $sensor_id = check_get_http_param('sensor_id', __FUNCTION__, NULL);
+        $trigger = check_get_http_param('trigger', __FUNCTION__, NULL);
+        
+        $db = new DBOperator();
+        $db->set_sensor_trigger($sensor_id, $device_id, base64_decode($trigger));
+        echo(json_encode(array("result" => "ok")));
+    }
+    
+    // api.php?device_id=&device_type=&credentials=&request_type=&name=(BASE64)&sensor_id=
+    // Return: {result:ok} {error_msg:xxx}(with HTTP 501) The latter is generated in ensure_not_null
+    function respond_set_sensor_name() {
+        $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
+        $sensor_id = check_get_http_param('sensor_id', __FUNCTION__, NULL);
+        $name = check_get_http_param('name', __FUNCTION__, NULL);
+        
+        $db = new DBOperator();
+        $db->set_sensor_name($sensor_id, $device_id, base64_decode($name));
+        echo(json_encode(array("result" => "ok")));
     }
 ?>

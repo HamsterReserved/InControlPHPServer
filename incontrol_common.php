@@ -2,21 +2,20 @@
     require_once('inccon_config.php');
 
     // If the first parameter is null, just show a error and exit
+    // Commonly used as an exit function in the rest of program
     function ensure_not_null($var_to_check, $var_name, $function_name, $prompt_msg = NULL) {
-        
         if ($prompt_msg == NULL)
             $prompt_msg = " not defined!"; // TODO: Is this needed or just take this as default value?
         
         if ($var_to_check == NULL)
+            header('HTTP/1.1 501 Not implemented');
+            header("status: 501 Not implemented");
             if (DEBUG) {
-                header('HTTP/1.1 501 Not implemented');
-                header("status: 501 Not implemented");
-                die($function_name . ": " . $var_name . $prompt_msg);
+                $err_desc_array = array("error_msg" => $function_name . ": " . $var_name . $prompt_msg);
             } else {
-                header('HTTP/1.1 501 Not implemented');
-                header("status: 501 Not implemented");
-                die("Not implemented.");
+                $err_desc_array = array("error_msg" => $function_name);
             }
+            die(json_encode($err_desc_array));
     }
 
     function check_credentials() {

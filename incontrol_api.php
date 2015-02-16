@@ -91,8 +91,13 @@
                 respond_device_info();
                 break;
             case REQUEST_TYPE_SET_DEVICE_NAME:
+                respond_set_device_name();
                 break;
             case REQUEST_TYPE_SET_SENSOR_TRIGGER:
+                respond_set_sensor_trigger();
+                break;
+            case REQUEST_TYPE_SET_SENSOR_NAME:
+                respond_set_sensor_name();
                 break;
             default:
                 ensure_not_null(NULL, "request_type", __FUNCTION__, " submitted is unknown!");
