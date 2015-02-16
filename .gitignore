@@ -1,2 +1,5 @@
 # Files to be uploaded to cloud services
 *.zip
+
+# IIS
+web.config

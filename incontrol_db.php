@@ -40,7 +40,7 @@
             $this->create_tables_for_array(SENSOR_INFO_TBL_NAME, $SENSOR_INFO_COLUMNS, SENSOR_INFO_PRIMARY_KEY);
         }
 
-        function check_mysqli_err($func ,$check_for_affected_rows = true) {
+        function check_mysqli_err($func, $check_for_affected_rows = true, $err_msg_for_row_zero = NULL) {
             if ($this->mysqli->connect_errno != 0) {
                     ensure_not_null(NULL, 
                             "DB Connection Failed with ", 
@@ -55,7 +55,10 @@
             }
             
             if ($check_for_affected_rows && $this->mysqli->affected_rows < 1) {
-                ensure_not_null(NULL, NULL, $func, "set failed");
+                if ($err_msg_for_row_zero == null)
+                    ensure_not_null(NULL, NULL, $func, "integrity check failed");
+                else
+                    ensure_not_null(NULL, NULL, $func, $err_msg_for_row_zero);
             }
         }
 
@@ -250,10 +253,7 @@
             
             $sql = "SELECT * FROM " . SENSOR_INFO_TBL_NAME . " WHERE assoc_machine_id = '$assoc_machine_id'";
             $result = $this->mysqli->query($sql);
-            $this->check_mysqli_err(__FUNCTION__);
-            
-            if ($this->mysqli->affected_rows < 1)
-                return NULL;
+            $this->check_mysqli_err(__FUNCTION__, true, "Wrong Device ID");
             
             $ret_array = array();
             while ($row = $result->fetch_assoc()) {
