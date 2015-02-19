@@ -223,7 +223,8 @@
             
             $real_rows = min($count, $this->mysqli->affected_rows);
             if ($real_rows < 1)
-                ensure_not_null(NULL, "No data in db", __FUNCTION__,"");
+                //ensure_not_null(NULL, "No data in db", __FUNCTION__,"");
+                $return_array = array ("sensor_id" => -1); // Invalid sensor ID
             else if ($real_rows == 1) {
                 $value_array = $value_result->fetch_assoc();
                 $return_array = array(
