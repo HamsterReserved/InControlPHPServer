@@ -232,7 +232,8 @@
                             "sensor_type" => $info_array["type"],
                             "sensor_name" => $info_array["name"],
                             "sensor_date" => $value_array["date"],
-                            "sensor_value" => $value_array["value"]
+                            "sensor_value" => $value_array["value"],
+                            "sensor_trigger" => $info_array["triggers"]
                             );
             } else {
                 $return_array = array();
