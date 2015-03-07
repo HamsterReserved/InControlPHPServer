@@ -25,6 +25,41 @@
         echo("OK");
     }
     
+    // api.php?device_id=&device_type=&credentials=&request_type=
+    // Return: device_name directly
+    function respond_server_name() {
+        $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
+        
+        $db = new DBOperator();
+        $result = $db->get_device_info($device_id);
+        
+        echo($result['name']);
+    }
+    
+    // api.php?device_id=&device_type=&credentials=&request_type=&sensor_id=
+    // Return: sensor_name directly
+    function respond_sensor_name() {
+        $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
+        $sensor_id = check_get_http_param('sensor_id', __FUNCTION__, NULL);
+        
+        $db = new DBOperator();
+        $result = $db->get_sensor_data_history($sensor_id, $device_id, 1);
+        
+        echo($result['sensor_name']);
+    }
+    
+    // api.php?device_id=&device_type=&credentials=&request_type=&sensor_id=
+    // Return: sensor_trigger directly
+    function respond_sensor_trigger() {
+        $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
+        $sensor_id = check_get_http_param('sensor_id', __FUNCTION__, NULL);
+        
+        $db = new DBOperator();
+        $result = $db->get_sensor_data_history($sensor_id, $device_id, 1);
+        
+        echo($result['sensor_trigger']);
+    }
+    
     // api.php?device_id=&device_type=&credentials=&request_type=&state=
     function respond_switch_state() {
         $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);

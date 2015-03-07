@@ -18,6 +18,9 @@
 
     /******** Server requests *********/
     define("REQUEST_TYPE_DATA_REPORT", 1);
+    define("REQUEST_TYPE_QUERY_SERVER_NAME", 2);
+    define("REQUEST_TYPE_QUERY_SENSOR_NAME", 3);
+    define("REQUEST_TYPE_QUERY_SENSOR_TRIGGER", 4);
     define("REQUEST_TYPE_SWITCH_STATE", 97);
     define("REQUEST_TYPE_USER_REGISTRATION", 98);
     define("REQUEST_TYPE_FACTORY_REGISTRATION", 99);

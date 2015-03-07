@@ -57,6 +57,15 @@
             case REQUEST_TYPE_DATA_REPORT:
                 respond_data_report();
                 break;
+            case REQUEST_TYPE_QUERY_SERVER_NAME:
+                respond_server_name();
+                break;
+            case REQUEST_TYPE_QUERY_SENSOR_NAME:
+                respond_sensor_name();
+                break;
+            case REQUEST_TYPE_QUERY_SENSOR_TRIGGER:
+                respond_sensor_trigger();
+                break;
             case REQUEST_TYPE_SWITCH_STATE:
                 respond_switch_state();
                 break;
