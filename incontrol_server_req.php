@@ -36,28 +36,20 @@
         echo($result['name']);
     }
     
-    // api.php?device_id=&device_type=&credentials=&request_type=&sensor_id=
-    // Return: sensor_name directly
-    function respond_sensor_name() {
+    // api.php?device_id=&device_type=&credentials=&request_type=
+    // Return: name;trigger|name;trigger...
+    function respond_server_sensor_list() {
         $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
-        $sensor_id = check_get_http_param('sensor_id', __FUNCTION__, NULL);
         
         $db = new DBOperator();
-        $result = $db->get_sensor_data_history($sensor_id, $device_id, 1);
+        $info_arr = $db->get_sensor_list($device_id);
         
-        echo($result['sensor_name']);
-    }
-    
-    // api.php?device_id=&device_type=&credentials=&request_type=&sensor_id=
-    // Return: sensor_trigger directly
-    function respond_sensor_trigger() {
-        $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
-        $sensor_id = check_get_http_param('sensor_id', __FUNCTION__, NULL);
+        foreach($info_arr as $info) {
+            $result = $result . $info["sensor_name"] . ";" . $info["sensor_trigger"] . "|";
+        }
+        $result = substr($result, 0, strlen($result) - 1); // Trailing "|"
         
-        $db = new DBOperator();
-        $result = $db->get_sensor_data_history($sensor_id, $device_id, 1);
-        
-        echo($result['sensor_trigger']);
+        echo $result;
     }
     
     // api.php?device_id=&device_type=&credentials=&request_type=&state=

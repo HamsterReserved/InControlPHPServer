@@ -60,11 +60,8 @@
             case REQUEST_TYPE_QUERY_SERVER_NAME:
                 respond_server_name();
                 break;
-            case REQUEST_TYPE_QUERY_SENSOR_NAME:
-                respond_sensor_name();
-                break;
-            case REQUEST_TYPE_QUERY_SENSOR_TRIGGER:
-                respond_sensor_trigger();
+            case REQUEST_TYPE_QUERY_SERVER_SENSOR_LIST:
+                respond_server_sensor_list();
                 break;
             case REQUEST_TYPE_SWITCH_STATE:
                 respond_switch_state();
