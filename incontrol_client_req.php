@@ -68,7 +68,7 @@
         
         $db = new DBOperator();
         $db->register_device($device_id, $name);
-        echo("OK");
+        echo(json_encode(array("result" => "ok")));
     }
     
     // api.php?device_id=&device_type=&credentials=&request_type=&name=(BASE64)
