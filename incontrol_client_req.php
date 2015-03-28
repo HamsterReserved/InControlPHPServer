@@ -64,7 +64,7 @@
     // If name is empty, original name will be preserved
     function respond_user_registration() {
         $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
-        $name = $_GET['device_name']; // Not mandatory.
+        $name = $_GET['name']; // Not mandatory.
         
         $db = new DBOperator();
         $db->register_device($device_id, $name);
