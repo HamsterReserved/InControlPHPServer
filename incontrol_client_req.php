@@ -60,6 +60,17 @@
         echo(json_encode($ret_array));
     }
     
+    // api.php?device_id=&device_type=&credentials=&request_type=&name=
+    // If name is empty, original name will be preserved
+    function respond_user_registration() {
+        $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
+        $name = $_GET['device_name']; // Not mandatory.
+        
+        $db = new DBOperator();
+        $db->register_device($device_id, $name);
+        echo("OK");
+    }
+    
     // api.php?device_id=&device_type=&credentials=&request_type=&name=(BASE64)
     // Return: {result:ok} {error_msg:xxx}(with HTTP 501) The latter is generated in ensure_not_null
     function respond_set_device_name() {

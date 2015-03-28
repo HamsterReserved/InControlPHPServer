@@ -62,17 +62,6 @@
         echo("OK");
     }
     
-    // api.php?device_id=&device_type=&credentials=&request_type=&name=
-    // If name is empty, original name will be preserved
-    function respond_user_registration() {
-        $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
-        $name = $_GET['name']; // Not mandatory.
-        
-        $db = new DBOperator();
-        $db->register_device($device_id, $name);
-        echo("OK");
-    }
-    
     // api.php?device_id=&device_type=&credentials=&request_type=
     // Will define a default name (InControl) in add_new_device
     // Cred here should be something internal to factory

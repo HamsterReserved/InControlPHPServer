@@ -12,6 +12,7 @@
     // define("REQUEST_TYPE_QUERY_SENSOR_INFO", 2); DEPRECATED! Now return full info in list.
     define("REQUEST_TYPE_QUERY_SENSOR_HISTORY", 3);
     define("REQUEST_TYPE_QUERY_DEVICE_INFO", 4);
+    define("REQUEST_TYPE_USER_REGISTRATION", 98);
     define("REQUEST_TYPE_SET_DEVICE_NAME", REQUEST_TYPE_SET_BASE + 1);
     define("REQUEST_TYPE_SET_SENSOR_TRIGGER", REQUEST_TYPE_SET_BASE + 2);
     define("REQUEST_TYPE_SET_SENSOR_NAME", REQUEST_TYPE_SET_BASE + 3);
@@ -21,7 +22,7 @@
     define("REQUEST_TYPE_QUERY_SERVER_NAME", 2);
     define("REQUEST_TYPE_QUERY_SERVER_SENSOR_LIST", 3);
     define("REQUEST_TYPE_SWITCH_STATE", 97);
-    define("REQUEST_TYPE_USER_REGISTRATION", 98);
+    // 98 is moved to client
     define("REQUEST_TYPE_FACTORY_REGISTRATION", 99);
 
     /******** Server states *********/

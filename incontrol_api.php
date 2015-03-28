@@ -66,9 +66,6 @@
             case REQUEST_TYPE_SWITCH_STATE:
                 respond_switch_state();
                 break;
-            case REQUEST_TYPE_USER_REGISTRATION:
-                respond_user_registration();
-                break;
             case REQUEST_TYPE_FACTORY_REGISTRATION:
                 respond_factory_registration();
                 break;
@@ -91,6 +88,9 @@
                 break;
             case REQUEST_TYPE_QUERY_DEVICE_INFO:
                 respond_device_info();
+                break;
+            case REQUEST_TYPE_USER_REGISTRATION:
+                respond_user_registration();
                 break;
             case REQUEST_TYPE_SET_DEVICE_NAME:
                 respond_set_device_name();
