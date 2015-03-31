@@ -67,7 +67,7 @@
         $name = $_GET['name']; // Not mandatory.
         
         $db = new DBOperator();
-        $db->register_device($device_id, $name);
+        $db->register_device($device_id, base64_decode($name));
         echo(json_encode(array("result" => "ok")));
     }
     

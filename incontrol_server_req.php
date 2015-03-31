@@ -37,7 +37,7 @@
     }
     
     // api.php?device_id=&device_type=&credentials=&request_type=
-    // Return: id;name;trigger|id;name;trigger...
+    // Return: id;name;trigger&id;name;trigger...
     function respond_server_sensor_list() {
         $device_id = check_get_http_param('device_id', __FUNCTION__, NULL);
         
@@ -45,7 +45,7 @@
         $info_arr = $db->get_sensor_list($device_id);
         
         foreach($info_arr as $info) {
-            $result = $result . $info["sensor_id"] . ";" . $info["sensor_name"] . ";" . $info["sensor_trigger"] . "|";
+            $result = $result . $info["sensor_id"] . ";" . $info["sensor_name"] . ";" . $info["sensor_trigger"] . "&";
         }
         $result = substr($result, 0, strlen($result) - 1); // Trailing "|"
         
